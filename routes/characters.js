@@ -1,8 +1,11 @@
 const router = require("express").Router();
 const axios = require("axios");
+const CharactersAPI = require("../services/charactersAPI");
+const APIHandler = new CharactersAPI();
 
 router.get("/", (req, res, next) => {
-  axios.get(process.env.API_URL + "/characters")
+  
+  APIHandler.getAll()
     .then( apiResponse => {
       res.render("characters/characters-list", {characters: apiResponse.data});
     })
@@ -25,7 +28,7 @@ router.post('/create', (req, res, next) => {
     weapon: req.body.weapon,
   }
 
-  axios.post(process.env.API_URL + "/characters", characterDetails)
+  APIHandler.create(characterDetails)
     .then( (response) => {
       res.redirect("/characters");
     })
@@ -36,7 +39,8 @@ router.post('/create', (req, res, next) => {
 
 
 router.get("/:characterId", (req, res, next) => {
-  axios.get(process.env.API_URL + "/characters/" + req.params.characterId)
+  
+  APIHandler.getOne(req.params.characterId)
     .then( apiResponse => {
       res.render("characters/character-details", apiResponse.data);
     })
@@ -45,7 +49,8 @@ router.get("/:characterId", (req, res, next) => {
 
 
 router.get("/:characterId/edit", (req, res, next) => {
-  axios.get(process.env.API_URL + "/characters/" + req.params.characterId)
+  
+  APIHandler.getOne(req.params.characterId)
     .then( (response) => {
       res.render("characters/character-edit", response.data);
     })
@@ -63,7 +68,7 @@ router.post("/:characterId/edit", (req, res, next) => {
     weapon: req.body.weapon,
   };
 
-  axios.put(process.env.API_URL + "/characters/"+req.params.characterId, newDetails)
+  APIHandler.updateOne(characterId, newDetails)
     .then( (response) => {
       res.redirect(`/characters/${characterId}`);
     })
@@ -74,7 +79,8 @@ router.post("/:characterId/edit", (req, res, next) => {
 
 
 router.post("/:characterId/delete", (req, res, next) => {
-  axios.delete(process.env.API_URL + "/characters/" + req.params.characterId)
+  
+  APIHandler.deleteOne(req.params.characterId)
     .then(() => {
       res.redirect("/characters");
     })
