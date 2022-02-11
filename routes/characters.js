@@ -1,9 +1,8 @@
 const router = require("express").Router();
-const Character = require("../models/Character.model");
 const axios = require("axios");
 
 router.get("/", (req, res, next) => {
-  axios.get("https://ih-crud-api.herokuapp.com/characters")
+  axios.get(process.env.API_URL + "/characters")
     .then( apiResponse => {
       res.render("characters/characters-list", {characters: apiResponse.data});
     })
@@ -26,7 +25,7 @@ router.post('/create', (req, res, next) => {
     weapon: req.body.weapon,
   }
 
-  axios.post("https://ih-crud-api.herokuapp.com/characters", characterDetails)
+  axios.post(process.env.API_URL + "/characters", characterDetails)
     .then( (response) => {
       res.redirect("/characters");
     })
@@ -37,7 +36,7 @@ router.post('/create', (req, res, next) => {
 
 
 router.get("/:characterId", (req, res, next) => {
-  axios.get("https://ih-crud-api.herokuapp.com/characters/"+req.params.characterId)
+  axios.get(process.env.API_URL + "/characters/" + req.params.characterId)
     .then( apiResponse => {
       res.render("characters/character-details", apiResponse.data);
     })
@@ -46,7 +45,7 @@ router.get("/:characterId", (req, res, next) => {
 
 
 router.get("/:characterId/edit", (req, res, next) => {
-  axios.get("https://ih-crud-api.herokuapp.com/characters/"+req.params.characterId)
+  axios.get(process.env.API_URL + "/characters/" + req.params.characterId)
     .then( (response) => {
       res.render("characters/character-edit", response.data);
     })
@@ -64,7 +63,7 @@ router.post("/:characterId/edit", (req, res, next) => {
     weapon: req.body.weapon,
   };
 
-  axios.put("https://ih-crud-api.herokuapp.com/characters/"+req.params.characterId, newDetails)
+  axios.put(process.env.API_URL + "/characters/"+req.params.characterId, newDetails)
     .then( (response) => {
       res.redirect(`/characters/${characterId}`);
     })
@@ -75,7 +74,7 @@ router.post("/:characterId/edit", (req, res, next) => {
 
 
 router.post("/:characterId/delete", (req, res, next) => {
-  axios.delete("https://ih-crud-api.herokuapp.com/characters/"+req.params.characterId)
+  axios.delete(process.env.API_URL + "/characters/" + req.params.characterId)
     .then(() => {
       res.redirect("/characters");
     })
