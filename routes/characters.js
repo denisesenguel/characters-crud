@@ -1,14 +1,15 @@
 const router = require("express").Router();
 const Character = require("../models/Character.model");
+const axios = require("axios");
 
 router.get("/", (req, res, next) => {
-  Character.find()
-    .then( charactersFromDB => {
-      res.render("characters/characters-list", {characters: charactersFromDB});
+  axios.get("https://ih-crud-api.herokuapp.com/characters")
+    .then( apiResponse => {
+      res.render("characters/characters-list", {characters: apiResponse.data});
     })
     .catch(err => {
-      console.log('Error getting characters from DB...', err);
-    })
+      console.log('Error getting characters from API...', err);
+    });
 });
 
 
@@ -25,8 +26,8 @@ router.post('/create', (req, res, next) => {
     weapon: req.body.weapon,
   }
 
-  Character.create(characterDetails)
-    .then( character => {
+  axios.post("https://ih-crud-api.herokuapp.com/characters", characterDetails)
+    .then( (response) => {
       res.redirect("/characters");
     })
     .catch( err => {
@@ -36,21 +37,21 @@ router.post('/create', (req, res, next) => {
 
 
 router.get("/:characterId", (req, res, next) => {
-  Character.findById(req.params.characterId)
-    .then( character => {
-      res.render("characters/character-details", character);
+  axios.get("https://ih-crud-api.herokuapp.com/characters/"+req.params.characterId)
+    .then( apiResponse => {
+      res.render("characters/character-details", apiResponse.data);
     })
     .catch();
 });
 
 
 router.get("/:characterId/edit", (req, res, next) => {
-  Character.findById(req.params.characterId)
-    .then( (characterDetails) => {
-      res.render("characters/character-edit", characterDetails);
+  axios.get("https://ih-crud-api.herokuapp.com/characters/"+req.params.characterId)
+    .then( (response) => {
+      res.render("characters/character-edit", response.data);
     })
     .catch( err => {
-      console.log("Error getting character details from DB...", err);
+      console.log("Error getting character details from API...", err);
     });
 });
 
@@ -61,10 +62,10 @@ router.post("/:characterId/edit", (req, res, next) => {
     name: req.body.name,
     occupation: req.body.occupation,
     weapon: req.body.weapon,
-  }
+  };
 
-  Character.findByIdAndUpdate(characterId, newDetails)
-    .then( () => {
+  axios.put("https://ih-crud-api.herokuapp.com/characters/"+req.params.characterId, newDetails)
+    .then( (response) => {
       res.redirect(`/characters/${characterId}`);
     })
     .catch( err => {
@@ -74,7 +75,7 @@ router.post("/:characterId/edit", (req, res, next) => {
 
 
 router.post("/:characterId/delete", (req, res, next) => {
-  Character.findByIdAndDelete(req.params.characterId)
+  axios.delete("https://ih-crud-api.herokuapp.com/characters/"+req.params.characterId)
     .then(() => {
       res.redirect("/characters");
     })
